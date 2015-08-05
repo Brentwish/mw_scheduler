@@ -26,8 +26,7 @@ def get_biweek(schedule)
                "SATURDAY",
                "SUNDAY"]
   schedule.each_with_index do |row, i|
-    row = row.compact
-    row = row.map { |a| a.upcase }
+    row = row.compact.map { |a| a.upcase }
     if row.all? { |word| week_days.include?(word) } && row != []
       a.push(i + 1)
     end
@@ -50,8 +49,7 @@ def get_date(day, hours)
       year = current_time.year
     end
   end
-  a = Time.new(year, month, day, hours)
-  return a
+  return Time.new(year, month, day, hours)
 end
 
 #takes the schedule, days, and a person and returns
@@ -64,18 +62,15 @@ def package_date_time(schedule, days, person)
 
   schedule.each_with_index do |row, i|
     days.each_with_index do |day, j|
-      if i < biweek[1]
-        date = week_1[j]
-      else date = week_2[j]
-      end
+      date = ( i < biweek[1] ? week_1[j] : week_2[j] )
       day_name = day[:day]
       name = row[day[:name]]
       hours = row[day[:hours]]
       if name && hours && name.downcase.include?(person)
-        a = {}
-        a[:name] = person
-        a[:date] = get_date(date, hours)
-        work_days.push(a)
+        work_days.push({
+          :name => person,
+          :date => get_date(date, hours)
+        })
       end
     end
   end
