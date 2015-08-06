@@ -12,7 +12,7 @@ DAYS = [
   {:day => "SUNDAY", :name => 13, :hours => 14 }]
 
 @schedule = CSV.read("july_27_2015.csv")
-@person = "trevor"
+@person = "brent"
 
 #Takes the schedule and returns an array
 #that (hopefully) contains the two rows
@@ -47,28 +47,14 @@ def get_date(day, hours)
   year = year.to_i
   month = month.to_i
   day = day.to_i
-  hours = parse_hours(hours)
-  start_time = DateTime.new(year, month, day, hours[0], 0, 0, '-7').to_s
-  end_time = DateTime.new(year, month, day, hours[1], 0, 0, '-7').to_s
-  return { :start => start_time, :end => end_time }
-end
-
-def parse_hours(hours)
   hours = hours.split('-')
   hours.map { |str| str.gsub!(/\s+/, "") } #removes all white space
-#an attempt to translate something like "5:30" to "5.5"
-#  hours.each do |time|
-#    if time.include?(":")
-#      time = time.split(":")
-#      time[1] = time[1].to_f / 60
-#      time = time[0].to_f + time[1]
-#    end
-#  end
-  hours[0] = (hours[0].to_i > 6 ? hours[0].to_i : hours[0].to_i + 12) #adjusts hours to a 24 hour clock. Pivots at 6
-  hours[1] = (hours[1].downcase.include?("close") ? 20 : hours[1].to_i + 12) #sets "close" to be 8pm
-  print hours
-  print "\n"
-  return hours
+  hours[0] = ((hours[0].to_i != 12 && hours[0].to_i > 6) ? hours[0] + "am" : hours[0] + "pm") #adjusts hours to a 24 hour clock. Pivots at 6
+  hours[1] = (hours[1].downcase.include?("close") ? "8pm" : hours[1] + "pm") #sets "close" to be 8pm
+  hours.map! { |time| DateTime.parse(time).strftime("%H:%M:%S") }
+  start_time = DateTime.parse("#{year}-" + sprintf("%02d", month) + "-" + sprintf("%02d", day) + "T#{hours[0]}" + "-0700")
+  end_time = DateTime.parse("#{year}-" + sprintf("%02d", month) + "-" + sprintf("%02d", day) + "T#{hours[1]}" + "-0700")
+  return { :start => start_time, :end => end_time }
 end
 
 #takes the schedule, days, and a person and returns
@@ -111,5 +97,4 @@ def main
   set_schedule
   puts get_work_days
 end
-
-get_work_days
+main
