@@ -6,7 +6,7 @@ require 'google/api_client/auth/storages/file_store'
 require 'fileutils'
 require 'date'
 
-module CalendarEventCreator
+module CalendarHandler
 
   APPLICATION_NAME = 'Google Calendar API Quickstart'
   CLIENT_SECRETS_PATH = 'client_secret.json'
@@ -21,7 +21,7 @@ module CalendarEventCreator
 # to approve the request.
 #
 # @return [Signet::OAuth2::Client] OAuth2 credentials
-  def CalendarEventCreator.authorize
+  def CalendarHandler.authorize
     FileUtils.mkdir_p(File.dirname(CREDENTIALS_PATH))
 
     file_store = Google::APIClient::FileStore.new(CREDENTIALS_PATH)
@@ -41,14 +41,14 @@ module CalendarEventCreator
   end
 
 # Initialize the API
-  def CalendarEventCreator.init
+  def CalendarHandler.init
     @client = Google::APIClient.new(:application_name => APPLICATION_NAME)
     @client.authorization = authorize
     @calendar_api = @client.discovered_api('calendar', 'v3')
   end
 
 # Fetch the next 10 events for the user
-  def CalendarEventCreator.fetch_ten_events
+  def CalendarHandler.fetch_ten_events
     results = @client.execute!(
       :api_method => @calendar_api.events.list,
       :parameters => {
@@ -66,7 +66,7 @@ module CalendarEventCreator
     end
   end
 
-  def CalendarEventCreator.create_event(start_date_time, end_date_time)
+  def CalendarHandler.create_event(start_date_time, end_date_time)
     event = {
       'summary' => 'Work',
       'location' => 'mw',

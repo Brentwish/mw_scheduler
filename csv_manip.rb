@@ -87,13 +87,13 @@ def set_schedule
   work_days.each do |day|
     start_time = day[:date][:start]
     end_time = day[:date][:end]
-    CalendarEventCreator.create_event(start_time, end_time)
+    CalendarHandler.create_event(start_time, end_time)
   end
-  CalendarEventCreator.fetch_ten_events
+  CalendarHandler.fetch_ten_events
 end
 
 def main
-  CalendarEventCreator.init
+  CalendarHandler.init
   set_schedule
   puts get_work_days
 end
