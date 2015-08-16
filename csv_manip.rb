@@ -1,4 +1,6 @@
-require './calendar_event_creator.rb'
+require './calendar_handler.rb'
+require './drive_handler.rb'
+require './private_data.rb'
 require 'csv'
 require 'date'
 
@@ -11,7 +13,7 @@ DAYS = [
   {:day => "SATURDAY", :name => 11, :hours => 12 },
   {:day => "SUNDAY", :name => 13, :hours => 14 }]
 
-@schedule = CSV.read("july_27_2015.csv")
+@schedule = CSV.read(SCHEDULE)
 @person = "brent"
 
 #Takes the schedule and returns an array
@@ -31,7 +33,7 @@ end
 
 #Takes a day and hour and formats it as a date
 def get_date(day, hours)
-  current_time = Time.new(2015, 7, 12) #Preset date for testing. Should be current time
+  current_time = Time.new   #(2015,7,26) Preset date for testing. Should be current time
   if day.to_i > current_time.day
     month = current_time.month
     year = current_time.year
@@ -60,6 +62,7 @@ end
 #takes the schedule, days, and a person and returns
 #an array of work days that that name works on
 def get_work_days
+  puts "Getting work days..."
   work_days = []
   biweek = get_biweek
   week_1 = @schedule[biweek[0]].compact.uniq
@@ -79,22 +82,26 @@ def get_work_days
       end
     end
   end
+  puts "Work days:\n#{work_days}"
   return work_days
 end
 
 def set_schedule
+  puts "Setting Schedule..."
   work_days = get_work_days
   work_days.each do |day|
     start_time = day[:date][:start]
     end_time = day[:date][:end]
     CalendarHandler.create_event(start_time, end_time)
   end
+  puts "Schedule Set"
   CalendarHandler.fetch_ten_events
 end
 
 def main
+  puts "Initialzing Calendar:"
   CalendarHandler.init
+  puts "Calendar intialized..."
   set_schedule
-  puts get_work_days
 end
 main

@@ -5,6 +5,7 @@ require 'google/api_client/auth/storage'
 require 'google/api_client/auth/storages/file_store'
 require 'fileutils'
 require 'date'
+require './private_data.rb'
 
 module CalendarHandler
 
@@ -52,7 +53,7 @@ module CalendarHandler
     results = @client.execute!(
       :api_method => @calendar_api.events.list,
       :parameters => {
-        :calendarId => 'primary',
+        :calendarId => WorkCalendar,
         :maxResults => 10,
         :singleEvents => true,
         :orderBy => 'startTime',
@@ -82,15 +83,14 @@ module CalendarHandler
       'reminders' => {
         'useDefault' => false,
         'overrides' => [
-          {'method' => 'email', 'minutes' => 24 * 60},
-          {'method' => 'popup', 'minutes' => 10},
+          {'method' => 'popup', 'minutes' => 60},
         ],
       },
     }
     results = @client.execute!(
       :api_method => @calendar_api.events.insert,
       :parameters => {
-        :calendarId => 'primary'},
+        :calendarId => WorkCalendar},
       :body_object => event)
     event = results.data
     puts "Event created: #{event.htmlLink}"
